@@ -11,7 +11,7 @@ import { config } from "https://deno.land/x/dotenv/mod.ts";
 import { DBConnect } from "./models/init.ts";
 
 // Router
-import blogsRouter from "./routes/blogs.ts";
+import { NewBlogsHandler } from "./routes/blogs.ts";
 
 // read from .env and inject variables
 // into the Deno.env
@@ -20,11 +20,14 @@ const secrets = config();
 // register a new oak instance
 const app = new Application();
 
-// register the router
-app.use(blogsRouter.routes());
+// connect database
+const db = DBConnect(secrets.MONGODB_URI);
 
-// makes sure OPTIONS request is handled
+// register the router
+// allowedMethods makes sure OPTIONS request is handled
 // and all unregistered methods are blocked
+const blogsRouter = NewBlogsHandler(db.collection("blogs"));
+app.use(blogsRouter.routes());
 app.use(blogsRouter.allowedMethods());
 
 // create a server and inject host:port
@@ -33,8 +36,6 @@ let srv = async (host: string, port: string) => {
 	await app.listen(`${host}:${port}`)
 };
 
-// connect database
-DBConnect(secrets.MONGODB_URI);
 
 // try to take port from env 
 // else use 3000
