@@ -39,7 +39,5 @@ docker container run -p 3000:3000 oak-mvc-template
 ```
 
 <p align="center">
-
 Made with :heart: by Angad Sharma
-
 </p>
